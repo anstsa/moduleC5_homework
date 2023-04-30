@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homework Skillfactory C5</title>
+  <style>
+    input {
+      width: 200px;
+      margin: 20px 0;
+    }
+
+    .result {
+      display: flex;
+      flex-wrap: wrap;
+      width: 500px;
+    }
+
+    .card {
+      width: 200px;
+      margin: 20px;
+    }
+
+    .card-image {
+      display: block;
+      width: 200px;
+      height: 150px;
+    }
+
+    .btn {
+      padding: 0;
+      background-color: transparent;
+      border: none;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: none;
+      cursor: pointer;
+    
+      margin: 5px 10px;
+      padding: 10px 15px;
+      border-radius: 1px;
+      font-size: 12px;
+      line-height: 15px;
+      text-transform: uppercase;
+      color: white;
+      background: #315efb;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      box-shadow: 0px 2px 8px 2px rgba(141,150,178,.3);
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <h1>Задание 5</h1>
+  <form name="test" method="post" action="input1.php">
+    <p><b>Страница:</b>
+     <input id="input_page" type="text" placeholder="Введите число от 1 до 10">
+    </p>
+    <p><b>Лимит:</b>
+     <input id="input_limit" type="text" placeholder="Введите число от 1 до 10">
+    </p>
+  </form>
+  <button class="btn j-btn-request">Ввывод картинок</button>
+  <button class="btn j-btn-clear">Чистка localStorage</button>
+  <div class="result j-result">Здесь будет результат запроса</div>
+
+<script>
+  const resultNode = document.querySelector('.j-result');
+  const btnNode = document.querySelector('.j-btn-request'); 
+  const btnClearNode = document.querySelector('.j-btn-clear') 
+  
+  let keyLocalStorage = localStorage.getItem('keyLocalStorage');
+    resultNode.innerHTML = keyLocalStorage;
+  
+  function useRequest(url) {
+    return fetch(url)
+     .then((response) => {return response.json();})
+     .then((data) => {
+       console.log(data); 
+       return data;
+     })
+     .catch(() => {console.log('error')});
+  }
+
+function displayResult(apiData) {
+    let cards = '';  
+    apiData.forEach(item => {
+      const cardBlock = `
+        <div class="card">
+          <img
+            src="${item.download_url}"
+            class="card-image"
+          />
+          <p>${item.author}</p>
+        </div>
+      `;
+      cards = cards + cardBlock;
+    });
+    resultNode.innerHTML = cards;
+    localStorage.setItem('keyLocalStorage', cards);
+  }
+
+  btnNode.addEventListener('click', async () => {
+    const value_page = document.querySelector('#input_page').value;
+    const value_limit = document.querySelector('#input_limit').value;
+    if (value_page >= 1 && value_page <= 10 && value_limit >= 1 && value_limit <= 10) {
+      const requestResult = await useRequest(`https://picsum.photos/v2/list?page=${value_page}&limit=${value_limit}`);
+      displayResult(requestResult);
+    }
+    else {
+      resultNode.innerHTML = `Страница: ${value_page}, лимит: ${value_limit} - вне диапазона от 1 до 10`
+    };   
+    
+  });
+
+btnClearNode.addEventListener('click', () => {
+  localStorage.clear();
+  console.log('Данные из localStorage удалены');
+});
+
+</script>
+</body>
+</html>
+
+
+<!-- // Вешаем обработчик на кнопку для запроса
+btnRequestNode.addEventListener('click', () => {
+  // Получаем данные по ключу myJSON в localStorage
+  const myJSON = localStorage.getItem('myJSON');
+  
+  if (myJSON) {
+    // Если данные в localStorage есть - просто выводим их
+    console.log('localStorage JSON', JSON.parse(myJSON));
+  } else {
+    // Если данных в localStorage нет - делаем запрос
+    useRequest('https://picsum.photos/v2/list/?limit=1', (json) => {
+      // Выводим данные, полученные в результате запроса
+      console.log('request JSON', json);
+      // Записываем результат запроса в localStorage
+      localStorage.setItem('myJSON', JSON.stringify(json));
+    });
+  }
+}); -->
